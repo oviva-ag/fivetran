@@ -1,0 +1,26 @@
+{
+  "state": {
+    "mock": "page:2"
+  },
+  "insert": {
+    "mock": [
+      {
+        "id": "1",
+        "Name": "hello"
+      },
+      {
+        "id": "2",
+        "Name": "dolly"
+      }
+    ]
+  },
+  "delete": {},
+  "schema": {
+    "mock": {
+      "primary_key": [
+        "id"
+      ]
+    }
+  },
+  "hasMore": false
+}
