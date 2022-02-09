@@ -94,3 +94,54 @@ func TestConnector_Sync_hasMore(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, true, res.HasMore, "has more")
 }
+
+func TestConnector_Sync_multipleConnectors(t *testing.T) {
+
+	table1 := &Table{
+		Name:       "table1",
+		State:      "page:2",
+		PrimaryKey: []string{"id"},
+		InsertRows: []interface{}{
+			struct {
+				Id   string `json:"id"`
+				Name string
+			}{"1", "hello"},
+			struct {
+				Id   string `json:"id"`
+				Name string
+			}{"2", "dolly"},
+		},
+		DeleteRows: nil,
+		HasMore:    false,
+	}
+	table1Connector := &mockTableConnector{table: table1}
+
+	table2 := &Table{
+		Name:       "table2",
+		State:      "page:2",
+		PrimaryKey: []string{"id"},
+		InsertRows: []interface{}{
+			struct {
+				Id   string `json:"id"`
+				Name string
+			}{"X", "Hi"},
+			struct {
+				Id   string `json:"id"`
+				Name string
+			}{"Y", "Joe"},
+		},
+		DeleteRows: nil,
+		HasMore:    false,
+	}
+	table2Connector := &mockTableConnector{table: table2}
+
+	connector, err := NewConnector([]TableConnector{table1Connector, table2Connector})
+	assert.NoError(t, err)
+
+	req := NewRequest()
+
+	//when
+	res, err := connector.Sync(context.TODO(), req)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(res.Insert)) // one entry for each table
+}

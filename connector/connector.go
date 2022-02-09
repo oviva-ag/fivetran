@@ -34,11 +34,10 @@ func (c *connector) Sync(ctx context.Context, req *Request) (*Response, error) {
 	tables := make(chan syncResult, tableCount)
 
 	for _, t := range c.tableConnectors {
-		go func() {
-			table, err := syncTable(ctx, t, req.State, req.Secrets)
+		go func(tableConnector TableConnector) {
+			table, err := syncTable(ctx, tableConnector, req.State, req.Secrets)
 			tables <- syncResult{table: table, err: err}
-		}()
-
+		}(t)
 	}
 
 	hasMore := false
