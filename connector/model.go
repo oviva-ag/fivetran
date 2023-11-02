@@ -20,8 +20,8 @@ func NewRequest() *Request {
 	}
 }
 
-type ResponseInserts map[string][]interface{}
-type ResponseDeletes map[string][]interface{}
+type ResponseInserts map[string][]any
+type ResponseDeletes map[string][]any
 
 type ResponseTableSchema struct {
 	PrimaryKey []string `json:"primary_key"`
@@ -53,7 +53,7 @@ type Connector interface {
 	Sync(ctx context.Context, req *Request) (*Response, error)
 }
 
-//Table represents a single synced table
+// Table represents a single synced table
 type Table struct {
 	//Name the name of the table
 	Name string
@@ -65,16 +65,16 @@ type Table struct {
 	PrimaryKey []string
 
 	//InsertRows additional rows to insert or update
-	InsertRows []interface{}
+	InsertRows []any
 
 	//DeleteRows rows to mark deleted, providing just the id column suffices
-	DeleteRows []interface{}
+	DeleteRows []any
 
 	//HasMore whether the connector could provide more data or all is synced
 	HasMore bool
 }
 
-//TableConnector is the connector for a single table
+// TableConnector is the connector for a single table
 type TableConnector interface {
 	//Name the name of the table
 	Name() string
