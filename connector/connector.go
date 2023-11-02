@@ -2,26 +2,22 @@ package connector
 
 import (
 	"context"
+
+	"golang.org/x/sync/errgroup"
 )
 
 type connector struct {
 	tableConnectors []TableConnector
 }
 
-//NewConnector creates a new fivetran connector with the given tables and their respective connector
+// NewConnector creates a new fivetran connector with the given tables and their respective connector
 func NewConnector(tables []TableConnector) (Connector, error) {
 	return &connector{
 		tableConnectors: tables,
 	}, nil
 }
 
-type syncResult struct {
-	table *Table
-	err   error
-}
-
 func (c *connector) Sync(ctx context.Context, req *Request) (*Response, error) {
-
 	res := NewResponse()
 
 	tableCount := len(c.tableConnectors)
@@ -31,24 +27,32 @@ func (c *connector) Sync(ctx context.Context, req *Request) (*Response, error) {
 		return res, nil
 	}
 
-	tables := make(chan syncResult, tableCount)
+	tables := make([]*Table, tableCount)
 
-	for _, t := range c.tableConnectors {
-		go func(tableConnector TableConnector) {
+	group, ctx := errgroup.WithContext(ctx)
+
+	for i, t := range c.tableConnectors {
+		idx := i
+		tableConnector := t
+		group.Go(func() error {
 			table, err := syncTable(ctx, tableConnector, req.State, req.Secrets)
-			tables <- syncResult{table: table, err: err}
-		}(t)
+			if err != nil {
+				return err
+			}
+			tables[idx] = table
+			return nil
+		})
+	}
+
+	err := group.Wait()
+	if err != nil {
+		return nil, err
 	}
 
 	hasMore := false
-	for i := 0; i < tableCount; i++ {
-		r := <-tables
-		if r.err != nil {
-			return nil, r.err
-		}
-
-		mergeTableResultsToResponse(res, r.table)
-		hasMore = hasMore || r.table.HasMore
+	for _, t := range tables {
+		mergeTableResultsToResponse(res, t)
+		hasMore = hasMore || t.HasMore
 	}
 
 	res.HasMore = hasMore
