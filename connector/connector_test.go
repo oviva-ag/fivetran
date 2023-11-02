@@ -42,7 +42,7 @@ func TestConnector_Sync_simpleConnector(t *testing.T) {
 		Name:       "mock",
 		State:      "page:2",
 		PrimaryKey: []string{"id"},
-		InsertRows: []interface{}{
+		InsertRows: []any{
 			struct {
 				Id   string `json:"id"`
 				Name string
@@ -101,7 +101,7 @@ func TestConnector_Sync_multipleConnectors(t *testing.T) {
 		Name:       "table1",
 		State:      "page:2",
 		PrimaryKey: []string{"id"},
-		InsertRows: []interface{}{
+		InsertRows: []any{
 			struct {
 				Id   string `json:"id"`
 				Name string
@@ -120,7 +120,7 @@ func TestConnector_Sync_multipleConnectors(t *testing.T) {
 		Name:       "table2",
 		State:      "page:2",
 		PrimaryKey: []string{"id"},
-		InsertRows: []interface{}{
+		InsertRows: []any{
 			struct {
 				Id   string `json:"id"`
 				Name string
