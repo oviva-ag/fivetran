@@ -8,16 +8,14 @@ import (
 
 // Codec is used to encode and decode state objects into plain strings
 type Codec interface {
-
-	//Encode encodes a struct into a simple string
+	// Encode encodes a struct into a simple string
 	Encode(d any) (string, error)
 
-	//Decode decodes a string into a given struct
+	// Decode decodes a string into a given struct
 	Decode(state string, d any) error
 }
 
-type jsonBase64Codec struct {
-}
+type jsonBase64Codec struct{}
 
 // NewJsonBase64Codec create a new codec using base64 encoded json to encode state
 func NewJsonBase64Codec() Codec {

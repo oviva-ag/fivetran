@@ -4,8 +4,9 @@ import (
 	"context"
 	_ "embed"
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 //go:embed fixture_connector_sync_simple.json
@@ -24,7 +25,6 @@ func (m *mockTableConnector) Sync(ctx context.Context, state string, secrets map
 }
 
 func TestConnector_Sync_empty(t *testing.T) {
-
 	connector, err := NewConnector([]TableConnector{})
 	assert.NoError(t, err)
 
@@ -33,11 +33,9 @@ func TestConnector_Sync_empty(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equalf(t, false, res.HasMore, "has no more elements")
-
 }
 
 func TestConnector_Sync_simpleConnector(t *testing.T) {
-
 	table := &Table{
 		Name:       "mock",
 		State:      "page:2",
@@ -63,7 +61,7 @@ func TestConnector_Sync_simpleConnector(t *testing.T) {
 
 	req := NewRequest()
 
-	//when
+	// when
 	res, err := connector.Sync(context.TODO(), req)
 	assert.NoError(t, err)
 
@@ -72,7 +70,6 @@ func TestConnector_Sync_simpleConnector(t *testing.T) {
 }
 
 func TestConnector_Sync_hasMore(t *testing.T) {
-
 	table := &Table{
 		Name:       "mock",
 		State:      "page:2",
@@ -89,14 +86,13 @@ func TestConnector_Sync_hasMore(t *testing.T) {
 
 	req := NewRequest()
 
-	//when
+	// when
 	res, err := connector.Sync(context.TODO(), req)
 	assert.NoError(t, err)
 	assert.Equal(t, true, res.HasMore, "has more")
 }
 
 func TestConnector_Sync_multipleConnectors(t *testing.T) {
-
 	table1 := &Table{
 		Name:       "table1",
 		State:      "page:2",
@@ -140,7 +136,7 @@ func TestConnector_Sync_multipleConnectors(t *testing.T) {
 
 	req := NewRequest()
 
-	//when
+	// when
 	res, err := connector.Sync(context.TODO(), req)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(res.Insert)) // one entry for each table
